@@ -1,9 +1,15 @@
-package crn.hjemmeoppgave.api.database.dbentities;
+package crn.hjemmeoppgave.api.dao.entities;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.sql.Timestamp;
 
+@Entity
+@Table(name = "userrole")
 public class UserRole {
-    private int id;
+    @Id
+    private Integer id;
     private int version;
     private int userId;
     private int unitId;
@@ -11,7 +17,10 @@ public class UserRole {
     private Timestamp validFrom;
     private Timestamp validTo;
 
-    public UserRole(int id, int version, int userId, int unitId, int roleId, Timestamp validFrom, Timestamp validTo) {
+    public UserRole() {
+    }
+
+    public UserRole(Integer id, int version, int userId, int unitId, int roleId, Timestamp validFrom, Timestamp validTo) {
         this.id = id;
         this.version = version;
         this.userId = userId;
@@ -21,11 +30,11 @@ public class UserRole {
         this.validTo = validTo;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

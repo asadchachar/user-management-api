@@ -1,30 +1,42 @@
-package crn.hjemmeoppgave.api.resources.model;
+package crn.hjemmeoppgave.api.dao.entities;
 
-public class UserModel {
+import javax.persistence.*;
+
+@Entity
+@Table(name ="role")
+public class Role {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
+    @Column(name = "version")
     private Integer version;
+    @Column(name = "name")
     private String name;
 
-    public UserModel(Integer id, Integer version, String name) {
+    public Role(Integer id, Integer version, String name) {
         this.id = id;
         this.version = version;
         this.name = name;
+    }
+
+    public Role() {
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public Integer getId() {
         return id;
     }
 
-    public Integer getVersion() {
+    public int getVersion() {
         return version;
     }
 
     public String getName() {
         return name;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public void setVersion(Integer version) {
