@@ -4,6 +4,7 @@ import crn.hjemmeoppgave.api.dao.IUserRoleRepository;
 import crn.hjemmeoppgave.api.dao.entities.UserRole;
 import crn.hjemmeoppgave.api.dao.entities.Users;
 import crn.hjemmeoppgave.api.resources.model.UserModel;
+import crn.hjemmeoppgave.api.resources.model.UserRoleModel;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.sql.Array;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -79,14 +81,12 @@ public class UserResource {
         return ResponseEntity.ok(Arrays.asList(userRole));
     }
 
-
     @POST
     @RequestMapping("/create")
     public ResponseEntity<Object> createNewUser (
             @RequestHeader Map<String, String> headers,
             @RequestBody UserModel userModel
-            )
-    {
+            ) {
         Users usr = map(userModel);
         userRepository.save(usr);
         return ResponseEntity.ok(usr);
@@ -97,10 +97,54 @@ public class UserResource {
     public ResponseEntity<Object> updateUser(
             @RequestHeader Map<String, String> headers,
             @RequestBody UserModel userModel
-    )
-    {
+    ) {
         this.userRepository.updateVersionAndNameById(userModel.getVersion(), userModel.getName(), userModel.getId());
         return ResponseEntity.ok(userModel);
+    }
+
+    @DELETE
+    @RequestMapping("/delete")
+    public ResponseEntity<Object> deleteUser(
+            @RequestHeader Map<String, String> headers,
+            @RequestBody UserModel userModel
+    ) {
+        Optional<List<UserRole>> role = this.userRoleRepository.findByUserId(userModel.getId());
+        if (role.isPresent() && role.get().size() != 0) {
+            // throw an exception
+            return ResponseEntity.ok(false);
+        }
+        else {
+            Users user = new Users();
+            user.setId(userModel.getId());
+            this.userRepository.delete(user);
+            return ResponseEntity.ok(true);
+        }
+
+    }
+    @POST
+    @RequestMapping("/createUserRole")
+    public ResponseEntity<Object> createUserRole (
+            @RequestHeader Map<String, String> headers,
+            @RequestBody UserRoleModel userRoleModel
+    ) {
+        UserRole userRole = mapRole(userRoleModel);
+
+        if(!this.userRepository.findById(userRole.getUserId()).isPresent()) {
+            return ResponseEntity.ok(false);
+        }
+
+        if(userRole.getValidTo() != null && userRole.getValidTo().before(userRole.getValidFrom())) {
+            return ResponseEntity.ok(false);
+        }
+
+        List<UserRole> existingRole =
+                this.userRoleRepository.findByUserIdAndUnitIdAndRoleId(userRole.getUserId(), userRole.getUnitId(), userRole.getRoleId());
+        if(existingRole != null && existingRole.size() > 0) {
+            return ResponseEntity.ok(false);
+        }
+
+        this.userRoleRepository.save(userRole);
+        return ResponseEntity.ok(userRole);
     }
 
     /*
@@ -116,15 +160,41 @@ public class UserResource {
         return dbUser;
 //        return new Users(userModel.getId(), userModel.getVersion(), userModel.getName());
     }
+    private UserRole mapRole(UserRoleModel userRoleModel) {
+        UserRole userRole = new UserRole();
+
+        userRole.setId(userRoleModel.getId() != null ? userRoleModel.getId() : getNextUserRoleId());
+        userRole.setVersion(userRoleModel.getId() != null ? userRoleModel.getVersion() : 1);
+        userRole.setUserId(userRoleModel.getUserId());
+        userRole.setUnitId(userRoleModel.getUnitId());
+        userRole.setRoleId(userRoleModel.getRoleId());
+        userRole.setValidFrom(userRoleModel.getValidFrom() != null ? userRoleModel.getValidFrom() : Timestamp.valueOf(LocalDateTime.now()));
+        userRole.setValidTo(userRoleModel.getValidTo());
+
+        return userRole;
+    }
+
+    private Integer getNextUserRoleId() {
+        ArrayList<UserRole> userRoles = new ArrayList<>();
+        this.userRoleRepository.findAll().forEach(userRoles::add);
+
+        int max = userRoles
+                .stream()
+                .mapToInt(UserRole::getId)
+                .max()
+                .getAsInt();
+        return max + 1;
+    }
+
 
     private Integer getNextUserId() {
         ArrayList<Users> users = new ArrayList<>();
         this.userRepository.findAll().forEach(users::add);
-        int a = users
+        int max = users
             .stream()
             .mapToInt(Users::getId)
             .max().getAsInt()
          ;
-        return a+1;
+        return max + 1;
     }
 }
