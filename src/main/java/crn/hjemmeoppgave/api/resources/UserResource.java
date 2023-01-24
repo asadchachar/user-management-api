@@ -3,8 +3,10 @@ import crn.hjemmeoppgave.api.dao.IUserRepository;
 import crn.hjemmeoppgave.api.dao.IUserRoleRepository;
 import crn.hjemmeoppgave.api.dao.entities.UserRole;
 import crn.hjemmeoppgave.api.dao.entities.Users;
+import crn.hjemmeoppgave.api.resources.model.UnitUsersModel;
 import crn.hjemmeoppgave.api.resources.model.UserModel;
 import crn.hjemmeoppgave.api.resources.model.UserRoleModel;
+import crn.hjemmeoppgave.api.resources.model.UserRolesModel;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.ResponseEntity;
@@ -16,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.sql.Array;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -146,10 +147,46 @@ public class UserResource {
         this.userRoleRepository.save(userRole);
         return ResponseEntity.ok(userRole);
     }
+    @POST
+    @RequestMapping("/unitUsersInfo")
+    public ResponseEntity<Object> getUnitUsersInfo (
+            @RequestHeader Map<String, String> headers,
+            @QueryParam("unitId") Integer unitId
+    ) {
+        UnitUsersModel u = new UnitUsersModel();
+        u.setUnitId(unitId);
+
+        List<UserRole> allUnitRoles = this.userRoleRepository.findByUnitId(unitId);
+        List<Integer> uniqueUserIds = allUnitRoles.stream().map(UserRole::getUserId).distinct().collect(Collectors.toList());
+
+        for (Integer userId :
+                uniqueUserIds) {
+            UserRolesModel userRolesModel = new UserRolesModel();
+
+            Users user = this.userRepository.findById(userId).get();
+            userRolesModel.setUser(mapToUserModel(user));
+
+            List<UserRole> userRoles = allUnitRoles.stream().filter(ur -> ur.getUserId() == userId).collect(Collectors.toList());
+            userRolesModel.setRoles(userRoles.stream().map(this::mapToRoleModel).collect(Collectors.toList()));
+
+            u.getUserRoles().add(userRolesModel);
+
+        }
+
+        return ResponseEntity.ok(u);
+    }
 
     /*
-    Mapping methods
-     */
+      Mapping methods
+    */
+
+    private UserModel mapToUserModel(Users user) {
+        UserModel um = new UserModel();
+        um.setId(user.getId());
+        um.setVersion(user.getVersion());
+        um.setName(user.getName());
+        return um;
+    }
 
     private Users map(UserModel userModel) {
         Users dbUser = new Users();
@@ -172,6 +209,20 @@ public class UserResource {
         userRole.setValidTo(userRoleModel.getValidTo());
 
         return userRole;
+    }
+
+    private UserRoleModel mapToRoleModel(UserRole userRole) {
+        UserRoleModel userRoleModel = new UserRoleModel();
+
+        userRoleModel.setId(userRole.getId());
+        userRoleModel.setVersion(userRole.getVersion());
+        userRoleModel.setUserId(userRole.getUserId());
+        userRoleModel.setUnitId(userRole.getUnitId());
+        userRoleModel.setRoleId(userRole.getRoleId());
+        userRoleModel.setValidFrom(userRole.getValidFrom());
+        userRoleModel.setValidTo(userRole.getValidTo());
+
+        return userRoleModel;
     }
 
     private Integer getNextUserRoleId() {

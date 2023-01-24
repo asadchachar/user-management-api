@@ -5,6 +5,9 @@ public class UserModel {
     private Integer version;
     private String name;
 
+    public UserModel() {
+    }
+
     public UserModel(Integer id, Integer version, String name) {
         this.id = id;
         this.version = version;

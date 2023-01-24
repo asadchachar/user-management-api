@@ -4,17 +4,17 @@ import java.sql.Timestamp;
 
 public class UserRoleModel {
     private Integer id;
-    private int version;
-    private int userId;
-    private int unitId;
-    private int roleId;
+    private Integer version;
+    private Integer userId;
+    private Integer unitId;
+    private Integer roleId;
     private Timestamp validFrom;
     private Timestamp validTo;
 
     public UserRoleModel() {
     }
 
-    public UserRoleModel(Integer id, int version, int userId, int unitId, int roleId, Timestamp validFrom, Timestamp validTo) {
+    public UserRoleModel(Integer id, Integer version, Integer userId, Integer unitId, Integer roleId, Timestamp validFrom, Timestamp validTo) {
         this.id = id;
         this.version = version;
         this.userId = userId;
@@ -32,35 +32,35 @@ public class UserRoleModel {
         this.id = id;
     }
 
-    public int getVersion() {
+    public Integer getVersion() {
         return version;
     }
 
-    public void setVersion(int version) {
+    public void setVersion(Integer version) {
         this.version = version;
     }
 
-    public int getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
-    public int getUnitId() {
+    public Integer getUnitId() {
         return unitId;
     }
 
-    public void setUnitId(int unitId) {
+    public void setUnitId(Integer unitId) {
         this.unitId = unitId;
     }
 
-    public int getRoleId() {
+    public Integer getRoleId() {
         return roleId;
     }
 
-    public void setRoleId(int roleId) {
+    public void setRoleId(Integer roleId) {
         this.roleId = roleId;
     }
 
