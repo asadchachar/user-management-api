@@ -3,7 +3,7 @@ package crn.hjemmeoppgave.api.dao.entities;
 import javax.persistence.*;
 
 @Entity
-@Table(name ="unit")
+@Table(name = "unit")
 public class Unit {
 
     @Id

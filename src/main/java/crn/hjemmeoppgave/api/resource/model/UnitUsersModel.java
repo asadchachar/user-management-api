@@ -1,8 +1,7 @@
-package crn.hjemmeoppgave.api.resources.model;
+package crn.hjemmeoppgave.api.resource.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class UnitUsersModel {
     private Integer unitId;

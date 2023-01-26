@@ -1,4 +1,4 @@
-package crn.hjemmeoppgave.api.resources.model;
+package crn.hjemmeoppgave.api.resource.model;
 
 public class UserModel {
     private Integer id;

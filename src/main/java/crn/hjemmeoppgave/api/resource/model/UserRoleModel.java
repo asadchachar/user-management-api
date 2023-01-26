@@ -1,4 +1,4 @@
-package crn.hjemmeoppgave.api.resources.model;
+package crn.hjemmeoppgave.api.resource.model;
 
 import java.sql.Timestamp;
 

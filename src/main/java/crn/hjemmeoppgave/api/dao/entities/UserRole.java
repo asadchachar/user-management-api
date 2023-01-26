@@ -1,5 +1,6 @@
 package crn.hjemmeoppgave.api.dao.entities;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -10,11 +11,17 @@ import java.sql.Timestamp;
 public class UserRole {
     @Id
     private Integer id;
+    @Column(name = "version")
     private int version;
+    @Column(name = "userId")
     private int userId;
+    @Column(name = "unitId")
     private int unitId;
+    @Column(name = "roleId")
     private int roleId;
+    @Column(name = "validFrom")
     private Timestamp validFrom;
+    @Column(name = "validTo")
     private Timestamp validTo;
 
     public UserRole() {

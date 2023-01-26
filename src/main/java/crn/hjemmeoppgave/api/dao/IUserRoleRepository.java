@@ -9,7 +9,9 @@ import java.util.Optional;
 
 public interface IUserRoleRepository extends CrudRepository<UserRole, Integer> {
     List<UserRole> findByUnitId(int unitId);
+
     List<UserRole> findByUserIdAndUnitIdAndRoleId(int userId, int unitId, int roleId);
+
     @Query("select u from UserRole u where u.userId = ?1")
     Optional<List<UserRole>> findByUserId(int userId);
 

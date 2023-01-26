@@ -3,7 +3,7 @@ package crn.hjemmeoppgave.api.dao.entities;
 import javax.persistence.*;
 
 @Entity
-@Table(name ="role")
+@Table(name = "role")
 public class Role {
 
     @Id
