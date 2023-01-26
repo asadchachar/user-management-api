@@ -4,6 +4,9 @@ import crn.hjemmeoppgave.api.dao.IUserRepository;
 import crn.hjemmeoppgave.api.dao.IUserRoleRepository;
 import crn.hjemmeoppgave.api.dao.entities.UserRole;
 import crn.hjemmeoppgave.api.dao.entities.Users;
+import crn.hjemmeoppgave.api.error.ResponseCode;
+import crn.hjemmeoppgave.api.error.UserException;
+import crn.hjemmeoppgave.api.resource.model.ResponseModel;
 import crn.hjemmeoppgave.api.resource.model.UserModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,58 +25,54 @@ public class UserService {
     @Autowired
     IUserRoleRepository userRoleRepository;
 
-    public Iterable<Users> findAllUsers() {
+    public Iterable<Users> getAllUsers() {
         return userRepository.findAll();
     }
 
+    public Optional<Users> getUserById(Integer userId) {
+        return this.userRepository.findById(userId);
+    }
     public List<Iterable<Users>> getUsersWithRoleInUnit(Integer unitId, Timestamp timestamp) {
+        if(unitId == null)
+            throw new UserException(ResponseCode.UNIT_ID_REQUIRED);
+        if(timestamp == null)
+            throw new UserException(ResponseCode.TIMESTAMP_REQUIRED);
+
         ArrayList<UserRole> userRoles = new ArrayList<>();
         this.userRoleRepository.findAll().forEach(userRoles::add);
 
-        List<Integer> userIds = userRoles.stream().filter(u -> u.getUnitId() == unitId).filter(u -> (u.getValidTo() != null && timestamp != null) ? u.getValidTo().after(timestamp) : true).map(UserRole::getUserId).distinct().collect(Collectors.toList());
+        List<Integer> userIds = userRoles.stream().filter(u -> u.getUnitId() == unitId).filter(u -> u.getValidTo() == null || timestamp == null || u.getValidTo().after(timestamp)).map(UserRole::getUserId).distinct().collect(Collectors.toList());
 
         return Arrays.asList(this.userRepository.findAllById(userIds));
     }
 
-    public Users createUser(Users dbUser) {
-        return userRepository.save(dbUser);
+    public Users createUser(Users user) {
+        if(user == null || user.getId() == null || user.getId() == 0)
+            throw new UserException(ResponseCode.USER_ID_REQUIRED);
+        return userRepository.save(user);
     }
 
     public int updateUser(Integer version, String name, Integer id) {
+        if(id == null || id == 0)
+            throw new UserException(ResponseCode.USER_ID_REQUIRED);
+
         return this.userRepository.updateVersionAndNameById(version, name, id);
     }
 
-    public Boolean deleteUser(UserModel userModel) {
+    public ResponseModel deleteUser(UserModel userModel) {
+        if(userModel == null || userModel.getId() == null || userModel.getId() == 0)
+            throw new UserException(ResponseCode.USER_ID_REQUIRED);
+
         Optional<List<UserRole>> role = this.userRoleRepository.findByUserId(userModel.getId());
         if (role.isPresent() && role.get().size() != 0) {
-            // throw an exception
-            return false;
+            throw new UserException(ResponseCode.ROLES_ALREADY_EXISTS);
         } else {
             Users user = new Users();
             user.setId(userModel.getId());
             this.userRepository.delete(user);
-            return true;
+            return new ResponseModel("User Deleted");
         }
     }
-
-    public UserRole createuserRole(UserRole userRole) {
-        if (!this.userRepository.findById(userRole.getUserId()).isPresent()) {
-            return null;
-        }
-
-        if (userRole.getValidTo() != null && userRole.getValidTo().before(userRole.getValidFrom())) {
-            return null;
-        }
-
-        List<UserRole> existingRole = this.userRoleRepository.findByUserIdAndUnitIdAndRoleId(userRole.getUserId(), userRole.getUnitId(), userRole.getRoleId());
-        if (existingRole != null && existingRole.size() > 0) {
-            return null;
-        }
-
-        return this.userRoleRepository.save(userRole);
-
-    }
-
 
     /*
     Mapper methods

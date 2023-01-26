@@ -4,6 +4,7 @@ import crn.hjemmeoppgave.api.service.UnitService;
 import crn.hjemmeoppgave.api.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,6 +27,13 @@ public class UnitResource {
     public ResponseEntity<Object> listAllUnits(
             @RequestHeader Map<String, String> headers) {
         return ResponseEntity.ok(this.unitService.getAllUnits());
+    }
+    @GET
+    @RequestMapping("/id/{unitId}")
+    public ResponseEntity<Object> getUnitById(
+            @RequestHeader Map<String, String> headers,
+            @PathVariable Integer unitId) {
+        return ResponseEntity.ok(this.unitService.getUnitById(unitId));
     }
 
     @GET

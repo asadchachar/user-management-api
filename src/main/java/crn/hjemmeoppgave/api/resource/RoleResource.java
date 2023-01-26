@@ -3,6 +3,7 @@ package crn.hjemmeoppgave.api.resource;
 import crn.hjemmeoppgave.api.service.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,6 +28,13 @@ public class RoleResource {
     public ResponseEntity<Object> getAllRoles(
             @RequestHeader Map<String, String> headers) {
         return ResponseEntity.ok(this.roleService.getAllRoles());
+    }
+    @GET
+    @RequestMapping("/id/{roleId}")
+    public ResponseEntity<Object> getRoleById(
+            @RequestHeader Map<String, String> headers,
+            @PathVariable Integer roleId) {
+        return ResponseEntity.ok(this.roleService.getRoleById(roleId));
     }
 
     /*

@@ -1,9 +1,9 @@
 package crn.hjemmeoppgave.api.resource;
 
-import crn.hjemmeoppgave.api.dao.entities.UserRole;
 import crn.hjemmeoppgave.api.dao.entities.Users;
+import crn.hjemmeoppgave.api.error.ResponseCode;
+import crn.hjemmeoppgave.api.error.UserException;
 import crn.hjemmeoppgave.api.resource.model.UserModel;
-import crn.hjemmeoppgave.api.resource.model.UserRoleModel;
 import crn.hjemmeoppgave.api.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.*;
 
 @RestController
@@ -33,7 +32,7 @@ public class UserResource {
     @RequestMapping("/all")
     public ResponseEntity<Object> listAllUsers(
             @RequestHeader Map<String, String> headers) {
-        return ResponseEntity.ok(this.userService.findAllUsers());
+        return ResponseEntity.ok(this.userService.getAllUsers());
     }
 
     @GET
@@ -43,6 +42,7 @@ public class UserResource {
             @QueryParam("unitId") Integer unitId,
             @QueryParam("timestamp") Timestamp timestamp
     ) {
+
         return ResponseEntity.ok(this.userService.getUsersWithRoleInUnit(unitId, timestamp));
     }
 
@@ -52,6 +52,9 @@ public class UserResource {
             @RequestHeader Map<String, String> headers,
             @RequestBody UserModel userModel
     ) {
+        if (userModel == null)
+            throw new UserException(ResponseCode.MISSING_DATA);
+
         Users dbUser = map(userModel);
 
         return ResponseEntity.ok(this.userService.createUser(dbUser));
@@ -91,7 +94,7 @@ public class UserResource {
 
     private Integer getNextUserId() {
         ArrayList<Users> users = new ArrayList<>();
-        this.userService.findAllUsers().forEach(users::add);
+        this.userService.getAllUsers().forEach(users::add);
         int max = users
                 .stream()
                 .mapToInt(Users::getId)

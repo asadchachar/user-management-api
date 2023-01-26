@@ -1,8 +1,12 @@
 package crn.hjemmeoppgave.api.resource;
 
 import crn.hjemmeoppgave.api.dao.entities.UserRole;
+import crn.hjemmeoppgave.api.error.ResponseCode;
+import crn.hjemmeoppgave.api.error.UserException;
 import crn.hjemmeoppgave.api.resource.model.UserRoleModel;
+import crn.hjemmeoppgave.api.service.RoleService;
 import crn.hjemmeoppgave.api.service.UserRoleService;
+import crn.hjemmeoppgave.api.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,6 +29,7 @@ public class UserRoleResource {
 
     @Autowired
     UserRoleService userRoleService;
+
     @GET
     @RequestMapping("/all")
     public ResponseEntity<Object> listAllUserRoles(
@@ -45,10 +50,17 @@ public class UserRoleResource {
 
     @POST
     @RequestMapping("/createUserRole")
-    public ResponseEntity<Object> createUserRole (
+    public ResponseEntity<Object> createUserRole(
             @RequestHeader Map<String, String> headers,
             @RequestBody UserRoleModel userRoleModel
     ) {
+        if(userRoleModel == null)
+            throw new UserException(ResponseCode.MISSING_DATA);
+        if (userRoleModel.getRoleId() == null)
+            throw new UserException(ResponseCode.ROLE_ID_REQUIRED);
+        if (userRoleModel.getUserId() == null)
+            throw new UserException(ResponseCode.USER_ID_REQUIRED);
+
         UserRole userRole = mapRole(userRoleModel);
 
         return ResponseEntity.ok(this.userRoleService.createuserRole(userRole));
