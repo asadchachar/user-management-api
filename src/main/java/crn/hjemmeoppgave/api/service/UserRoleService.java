@@ -24,6 +24,12 @@ public class UserRoleService {
     @Autowired
     IRoleRepository roleRepository;
 
+    public UserRoleService(IUserRepository userRepository, IUserRoleRepository userRoleRepository, IRoleRepository roleRepository) {
+        this.userRepository = userRepository;
+        this.userRoleRepository = userRoleRepository;
+        this.roleRepository = roleRepository;
+    }
+
     public Iterable<UserRole> getAllUserRoles() {
         return userRoleRepository.findAll();
     }
@@ -38,7 +44,7 @@ public class UserRoleService {
 
     }
 
-    public UserRole createuserRole(UserRole userRole) {
+    public UserRole createUserRole(UserRole userRole) {
 
         if (!this.roleRepository.findById(userRole.getRoleId()).isPresent())
             throw new UserException(ResponseCode.ROLE_DOES_NOT_EXIST);

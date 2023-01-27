@@ -12,6 +12,13 @@ public class RoleService {
     @Autowired
     IRoleRepository roleRepository;
 
+    public RoleService() {
+    }
+
+    public RoleService(IRoleRepository roleRepository) {
+        this.roleRepository = roleRepository;
+    }
+
     public Iterable<Role> getAllRoles() {
         return this.roleRepository.findAll();
     }

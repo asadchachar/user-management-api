@@ -4,9 +4,7 @@ import crn.hjemmeoppgave.api.dao.entities.UserRole;
 import crn.hjemmeoppgave.api.error.ResponseCode;
 import crn.hjemmeoppgave.api.error.UserException;
 import crn.hjemmeoppgave.api.resource.model.UserRoleModel;
-import crn.hjemmeoppgave.api.service.RoleService;
 import crn.hjemmeoppgave.api.service.UserRoleService;
-import crn.hjemmeoppgave.api.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -63,7 +61,7 @@ public class UserRoleResource {
 
         UserRole userRole = mapRole(userRoleModel);
 
-        return ResponseEntity.ok(this.userRoleService.createuserRole(userRole));
+        return ResponseEntity.ok(this.userRoleService.createUserRole(userRole));
     }
 
     /*

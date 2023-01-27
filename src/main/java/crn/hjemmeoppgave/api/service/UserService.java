@@ -25,6 +25,14 @@ public class UserService {
     @Autowired
     IUserRoleRepository userRoleRepository;
 
+    public UserService() {
+    }
+
+    public UserService(IUserRepository userRepository, IUserRoleRepository userRoleRepository) {
+        this.userRepository = userRepository;
+        this.userRoleRepository = userRoleRepository;
+    }
+
     public Iterable<Users> getAllUsers() {
         return userRepository.findAll();
     }
